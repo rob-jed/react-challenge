@@ -1,0 +1,27 @@
+html,
+body {
+    height: 100%;
+}
+
+body {
+    min-width: 320px;
+
+    font-family: var(--primaryFont);
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--primaryColor);
+
+    background-color: #fff;
+
+    -webkit-font-smoothing: antialiased;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+input::-ms-clear {
+    display: none;
+}
