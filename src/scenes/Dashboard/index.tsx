@@ -7,6 +7,7 @@ import ChartDescription from 'components/ChartDescription';
 import Filters from 'components/Filters';
 import PrimaryLayout from 'components/PrimaryLayout';
 import { SelectOption } from 'components/Select';
+import Spinner from 'components/Spinner';
 
 import {
     combineDaysData,
@@ -84,90 +85,107 @@ const Dashboard = () => {
         });
     };
 
-    if (!advertisingData) {
-        return null;
-    }
-
     return (
         <PrimaryLayout>
-            <Filters
-                campaignsOptions={advertisingData.campaigns.map(entry => ({
-                    label: entry,
-                    value: entry,
-                }))}
-                datasourcesOptions={advertisingData.datasources.map(entry => ({
-                    label: entry,
-                    value: entry,
-                }))}
-                onSelect={onSelect}
-                onSubmit={applyFilters}
-            />
+            {advertisingData ? (
+                <>
+                    <Filters
+                        campaignsOptions={advertisingData.campaigns.map(
+                            entry => ({
+                                label: entry,
+                                value: entry,
+                            })
+                        )}
+                        datasourcesOptions={advertisingData.datasources.map(
+                            entry => ({
+                                label: entry,
+                                value: entry,
+                            })
+                        )}
+                        onSelect={onSelect}
+                        onSubmit={applyFilters}
+                    />
 
-            <Line
-                data={{
-                    datasets: [
-                        {
-                            label: 'Clicks',
-                            borderColor: 'rgb(255, 99, 132)',
-                            yAxisID: 'clicks',
-                            fill: false,
-                            data: getClicksChartData(advertisingData.chartData),
-                        },
-                        {
-                            label: 'Impressions',
-                            borderColor: 'rgb(54, 162, 235)',
-                            yAxisID: 'impressions',
-                            fill: false,
-                            data: getImpressionsChartData(
-                                advertisingData.chartData
-                            ),
-                        },
-                    ],
-                }}
-                options={{
-                    legend: {
-                        position: 'bottom',
-                    },
-                    scales: {
-                        xAxes: [
-                            {
-                                type: 'time',
-                                display: true,
-                                distribution: 'series',
-                                time: {
-                                    unit: 'day',
-                                    tooltipFormat: 'MMMM DD',
+                    <Line
+                        data={{
+                            datasets: [
+                                {
+                                    label: 'Clicks',
+                                    borderColor: 'rgb(255, 99, 132)',
+                                    yAxisID: 'clicks',
+                                    fill: false,
+                                    data: getClicksChartData(
+                                        advertisingData.chartData
+                                    ),
+                                },
+                                {
+                                    label: 'Impressions',
+                                    borderColor: 'rgb(54, 162, 235)',
+                                    yAxisID: 'impressions',
+                                    fill: false,
+                                    data: getImpressionsChartData(
+                                        advertisingData.chartData
+                                    ),
+                                },
+                            ],
+                        }}
+                        options={{
+                            hover: {
+                                animationDuration: 0,
+                            },
+                            responsiveAnimationDuration: 0,
+                            elements: {
+                                line: {
+                                    tension: 0,
                                 },
                             },
-                        ],
-                        yAxes: [
-                            {
-                                id: 'clicks',
-                                ticks: {
-                                    beginAtZero: true,
-                                },
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: 'Clicks',
-                                },
+                            legend: {
+                                position: 'bottom',
                             },
-                            {
-                                id: 'impressions',
-                                ticks: {
-                                    beginAtZero: true,
-                                },
-                                position: 'right',
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: 'Impressions',
-                                },
+                            scales: {
+                                xAxes: [
+                                    {
+                                        type: 'time',
+                                        display: true,
+                                        distribution: 'series',
+                                        time: {
+                                            unit: 'day',
+                                            tooltipFormat: 'MMMM DD',
+                                        },
+                                    },
+                                ],
+                                yAxes: [
+                                    {
+                                        id: 'clicks',
+                                        ticks: {
+                                            beginAtZero: true,
+                                        },
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Clicks',
+                                        },
+                                    },
+                                    {
+                                        id: 'impressions',
+                                        ticks: {
+                                            beginAtZero: true,
+                                        },
+                                        position: 'right',
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Impressions',
+                                        },
+                                    },
+                                ],
                             },
-                        ],
-                    },
-                }}
-            />
+                        }}
+                    />
 
-            <ChartDescription />
+                    <ChartDescription />
+                </>
+            ) : (
+                <Spinner message="Loading your data. Please wait" />
+            )}
         </PrimaryLayout>
     );
 };
