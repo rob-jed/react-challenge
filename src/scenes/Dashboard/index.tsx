@@ -145,6 +145,9 @@ const Dashboard = () => {
                             scales: {
                                 xAxes: [
                                     {
+                                        ticks: {
+                                            maxTicksLimit: 20,
+                                        },
                                         type: 'time',
                                         display: true,
                                         distribution: 'series',
