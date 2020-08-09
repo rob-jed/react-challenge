@@ -18,6 +18,8 @@
     "react-chartjs-2": "^2.10.0",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
+    "react-select": "^3.1.0",
+    "react-windowed-select": "^2.0.3",
     "typescript": "~3.7.2"
   },
   "devDependencies": {
@@ -25,6 +27,7 @@
     "@types/chart.js": "^2.9.23",
     "@types/lodash": "^4.14.159",
     "@types/papaparse": "^5.0.6",
+    "@types/react-select": "^3.0.16",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
     "eslint-config-airbnb": "^18.1.0",

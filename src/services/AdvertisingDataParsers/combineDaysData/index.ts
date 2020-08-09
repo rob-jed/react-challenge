@@ -1,9 +1,7 @@
-import { AdvertiseData } from 'types/advertisings';
+import { AdvertiseChartData, AdvertiseData } from 'types/advertisings';
 
 const combineDaysData = (data: AdvertiseData[]) => {
-    const results: {
-        [key: string]: { Clicks: number; Impressions: number };
-    } = {};
+    const results: AdvertiseChartData = {};
 
     data.forEach(entry => {
         if (results[entry.Date]) {

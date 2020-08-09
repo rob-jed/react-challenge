@@ -1,13 +1,15 @@
 import combineDaysData from './combineDaysData';
 import filterByDate from './filterByDate';
 import getCampaigns from './getCampaigns';
+import getClicksChartData from './getClicksChartData';
 import getDatasources from './getDatasources';
-import sortByDate from './sortByDate';
+import getImpressionsChartData from './getImpressionsChartData';
 
 export {
     combineDaysData,
     filterByDate,
     getCampaigns,
+    getClicksChartData,
     getDatasources,
-    sortByDate,
+    getImpressionsChartData,
 };

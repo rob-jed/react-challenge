@@ -5,3 +5,7 @@ export type AdvertiseData = {
     Date: string;
     Impressions?: string;
 };
+
+export type AdvertiseChartData = {
+    [key: string]: { Clicks: number; Impressions: number };
+};

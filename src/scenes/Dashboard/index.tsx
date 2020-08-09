@@ -1,39 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import { ParseResult } from 'papaparse';
 import { Line } from 'react-chartjs-2';
-import moment from 'moment';
+import { createFilter, ValueType } from 'react-select';
+import { filter } from 'lodash';
 
 import PrimaryLayout from 'components/PrimaryLayout';
+import Select, { SelectOption } from 'components/Select';
 
 import {
     combineDaysData,
     filterByDate,
     getCampaigns,
+    getClicksChartData,
     getDatasources,
-    sortByDate,
+    getImpressionsChartData,
 } from 'services/AdvertisingDataParsers';
-
-import { AdvertiseData } from 'types/advertisings';
-
 import { getAdvertisingData } from 'services/APIQueries';
+
+import { AdvertiseChartData, AdvertiseData } from 'types/advertisings';
 
 const Dashboard = () => {
     const [advertisingData, setAdvertisingData] = useState<{
         data: AdvertiseData[];
-        chartData: ReturnType<typeof combineDaysData>;
+        chartData: AdvertiseChartData;
         campaigns: string[];
         datasources: string[];
     } | null>(null);
-
+    const [activeFilters, setActiveFilters] = useState<{
+        campaigns: string[];
+        datasources: string[];
+    }>({
+        campaigns: [],
+        datasources: [],
+    });
     const handleAdvertisingData = (results: ParseResult<AdvertiseData>) => {
         const filteredData = filterByDate(results.data);
-        const sortedByDate = sortByDate(filteredData);
-        const campaigns = getCampaigns(sortedByDate);
-        const datasources = getDatasources(sortedByDate);
+        const campaigns = getCampaigns(filteredData);
+        const datasources = getDatasources(filteredData);
 
         setAdvertisingData({
-            data: sortedByDate,
-            chartData: combineDaysData(sortedByDate),
+            data: filteredData,
+            chartData: combineDaysData(filteredData),
             campaigns,
             datasources,
         });
@@ -43,12 +50,89 @@ const Dashboard = () => {
         getAdvertisingData(handleAdvertisingData);
     }, []);
 
+    const handleChange = (
+        selectedOptions: ValueType<SelectOption>,
+        name: string
+    ) => {
+        if (!selectedOptions) {
+            setActiveFilters({
+                ...activeFilters,
+                [name]: [],
+            });
+
+            return;
+        }
+
+        setActiveFilters({
+            ...activeFilters,
+            [name]: (selectedOptions as SelectOption[]).map(
+                selectedOption => selectedOption!.value
+            ),
+        });
+    };
+    const applyFilters = () => {
+        const filteredChartData = filter(advertisingData?.data, entry => {
+            if (
+                activeFilters.campaigns.length &&
+                activeFilters.datasources.length
+            ) {
+                return (
+                    activeFilters.campaigns.includes(entry.Campaign) &&
+                    activeFilters.datasources.includes(entry.Datasource)
+                );
+            }
+
+            if (activeFilters.campaigns.length) {
+                return activeFilters.campaigns.includes(entry.Campaign);
+            }
+
+            if (activeFilters.datasources.length) {
+                return activeFilters.datasources.includes(entry.Datasource);
+            }
+
+            return true;
+        });
+
+        setAdvertisingData({
+            ...advertisingData!,
+            chartData: combineDaysData(filteredChartData as any),
+        });
+    };
+
     if (!advertisingData) {
         return null;
     }
 
     return (
         <PrimaryLayout>
+            <Select
+                filterOption={createFilter({ ignoreAccents: false })}
+                isMulti
+                label="Campaigns"
+                name="campaigns"
+                handleSelect={handleChange}
+                options={advertisingData.campaigns.map(entry => ({
+                    label: entry,
+                    value: entry,
+                }))}
+            />
+
+            <Select
+                filterOption={createFilter({ ignoreAccents: false })}
+                isMulti
+                label="Datasources"
+                name="datasources"
+                handleSelect={handleChange}
+                options={advertisingData.datasources.map(entry => ({
+                    label: entry,
+                    value: entry,
+                }))}
+            />
+
+            <button type="button" onClick={applyFilters}>
+                Apply
+            </button>
+
             <Line
                 data={{
                     datasets: [
@@ -57,22 +141,15 @@ const Dashboard = () => {
                             borderColor: 'red',
                             yAxisID: 'clicks',
                             fill: false,
-                            data: Object.entries(advertisingData.chartData).map(
-                                ([key, value]) => ({
-                                    x: moment(key, 'DD.MM.YYYY'),
-                                    y: value.Clicks,
-                                })
-                            ),
+                            data: getClicksChartData(advertisingData.chartData),
                         },
                         {
                             label: 'Impressions',
+                            borderColor: 'blue',
                             yAxisID: 'impressions',
                             fill: false,
-                            data: Object.entries(advertisingData.chartData).map(
-                                ([key, value]) => ({
-                                    x: moment(key, 'DD.MM.YYYY'),
-                                    y: value.Impressions,
-                                })
+                            data: getImpressionsChartData(
+                                advertisingData.chartData
                             ),
                         },
                     ],
