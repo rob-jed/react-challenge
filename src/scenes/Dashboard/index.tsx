@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { ParseResult } from 'papaparse';
 import { Line } from 'react-chartjs-2';
-import { createFilter, ValueType } from 'react-select';
-import { filter } from 'lodash';
+import { ValueType } from 'react-select';
 
+import ChartDescription from 'components/ChartDescription';
+import Filters from 'components/Filters';
 import PrimaryLayout from 'components/PrimaryLayout';
-import Select, { SelectOption } from 'components/Select';
+import { SelectOption } from 'components/Select';
 
 import {
     combineDaysData,
+    filterAdvertisingData,
     filterByDate,
     getCampaigns,
     getClicksChartData,
@@ -50,7 +52,7 @@ const Dashboard = () => {
         getAdvertisingData(handleAdvertisingData);
     }, []);
 
-    const handleChange = (
+    const onSelect = (
         selectedOptions: ValueType<SelectOption>,
         name: string
     ) => {
@@ -71,31 +73,14 @@ const Dashboard = () => {
         });
     };
     const applyFilters = () => {
-        const filteredChartData = filter(advertisingData?.data, entry => {
-            if (
-                activeFilters.campaigns.length &&
-                activeFilters.datasources.length
-            ) {
-                return (
-                    activeFilters.campaigns.includes(entry.Campaign) &&
-                    activeFilters.datasources.includes(entry.Datasource)
-                );
-            }
-
-            if (activeFilters.campaigns.length) {
-                return activeFilters.campaigns.includes(entry.Campaign);
-            }
-
-            if (activeFilters.datasources.length) {
-                return activeFilters.datasources.includes(entry.Datasource);
-            }
-
-            return true;
-        });
+        const filteredChartData = filterAdvertisingData(
+            advertisingData!.data,
+            activeFilters
+        );
 
         setAdvertisingData({
             ...advertisingData!,
-            chartData: combineDaysData(filteredChartData as any),
+            chartData: combineDaysData(filteredChartData),
         });
     };
 
@@ -105,47 +90,32 @@ const Dashboard = () => {
 
     return (
         <PrimaryLayout>
-            <Select
-                filterOption={createFilter({ ignoreAccents: false })}
-                isMulti
-                label="Campaigns"
-                name="campaigns"
-                handleSelect={handleChange}
-                options={advertisingData.campaigns.map(entry => ({
+            <Filters
+                campaignsOptions={advertisingData.campaigns.map(entry => ({
                     label: entry,
                     value: entry,
                 }))}
-            />
-
-            <Select
-                filterOption={createFilter({ ignoreAccents: false })}
-                isMulti
-                label="Datasources"
-                name="datasources"
-                handleSelect={handleChange}
-                options={advertisingData.datasources.map(entry => ({
+                datasourcesOptions={advertisingData.datasources.map(entry => ({
                     label: entry,
                     value: entry,
                 }))}
+                onSelect={onSelect}
+                onSubmit={applyFilters}
             />
-
-            <button type="button" onClick={applyFilters}>
-                Apply
-            </button>
 
             <Line
                 data={{
                     datasets: [
                         {
                             label: 'Clicks',
-                            borderColor: 'red',
+                            borderColor: 'rgb(255, 99, 132)',
                             yAxisID: 'clicks',
                             fill: false,
                             data: getClicksChartData(advertisingData.chartData),
                         },
                         {
                             label: 'Impressions',
-                            borderColor: 'blue',
+                            borderColor: 'rgb(54, 162, 235)',
                             yAxisID: 'impressions',
                             fill: false,
                             data: getImpressionsChartData(
@@ -155,13 +125,18 @@ const Dashboard = () => {
                     ],
                 }}
                 options={{
+                    legend: {
+                        position: 'bottom',
+                    },
                     scales: {
                         xAxes: [
                             {
                                 type: 'time',
                                 display: true,
+                                distribution: 'series',
                                 time: {
                                     unit: 'day',
+                                    tooltipFormat: 'MMMM DD',
                                 },
                             },
                         ],
@@ -191,6 +166,8 @@ const Dashboard = () => {
                     },
                 }}
             />
+
+            <ChartDescription />
         </PrimaryLayout>
     );
 };

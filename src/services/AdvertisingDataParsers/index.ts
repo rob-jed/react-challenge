@@ -1,4 +1,5 @@
 import combineDaysData from './combineDaysData';
+import filterAdvertisingData from './filterAdvertisingData';
 import filterByDate from './filterByDate';
 import getCampaigns from './getCampaigns';
 import getClicksChartData from './getClicksChartData';
@@ -7,6 +8,7 @@ import getImpressionsChartData from './getImpressionsChartData';
 
 export {
     combineDaysData,
+    filterAdvertisingData,
     filterByDate,
     getCampaigns,
     getClicksChartData,

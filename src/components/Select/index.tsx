@@ -2,30 +2,31 @@ import React from 'react';
 import ReactSelect from 'react-windowed-select';
 import { Props, ValueType } from 'react-select';
 
-export type SelectOption = { label: string; value: string | number };
+import styles from './styles.module.scss';
+
+export type SelectOption = { label: string; value: string };
 
 type SelectProps = Props & {
+    className?: string;
     label?: string;
     name: string;
-    handleSelect: (
-        selectedOption: ValueType<SelectOption>,
-        name: string
-    ) => void;
+    onSelect: (selectedOption: ValueType<SelectOption>, name: string) => void;
 };
 
 const Select: React.FC<SelectProps> = ({
+    className,
     label,
     name,
-    handleSelect,
+    onSelect,
     ...reactSelectProps
 }) => {
     const patchedOnChange = (selectedOption: ValueType<SelectOption>) => {
-        handleSelect(selectedOption, name!);
+        onSelect(selectedOption, name!);
     };
 
     return (
-        <div>
-            {label && <h4>{label}</h4>}
+        <div className={className}>
+            {label && <h4 className={styles.SelectLabel}>{label}</h4>}
             <ReactSelect onChange={patchedOnChange} {...reactSelectProps} />
         </div>
     );

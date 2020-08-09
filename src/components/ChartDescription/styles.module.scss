@@ -1,0 +1,36 @@
+.DescriptionWrapper {
+    padding: 15px;
+
+    margin: 20px 0;
+
+    border: 1px solid #dee6fb;
+    border-radius: 4px;
+}
+
+.DescriptionHeader {
+    margin-bottom: 12px;
+
+    font-size: 20px;
+    line-height: 24px;
+    text-align: center;
+}
+
+.DescriptionList {
+    padding-left: 20px;
+
+    list-style: disc;
+
+
+    li {
+        font-weight: 300;
+    }
+}
+
+.ListNote {
+    display: inline-block;
+
+    margin-bottom: 10px;
+
+    font-size: 12px;
+    font-weight: 300;
+}
